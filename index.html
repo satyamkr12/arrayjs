@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Lab — Arrays</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --card: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #f0e040;
+    --accent2: #40e0c8;
+    --accent3: #f06040;
+    --accent4: #a78bfa;
+    --text: #f0ede8;
+    --muted: #888;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  header { padding: 2rem 2rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .logo { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; }
+  .logo span { color: var(--accent); }
+  .tab-bar { display: flex; gap: 0.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px; margin-left: auto; flex-wrap: wrap; }
+  .tab { padding: 0.45rem 1rem; border-radius: 6px; border: none; background: transparent; color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: #0d0d0d; }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .section { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 0.25rem; }
+  .section-title span { color: var(--accent); }
+  .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .concept { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .concept-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .badge { font-family: 'Space Mono', monospace; font-size: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 4px; background: var(--accent); color: #0d0d0d; font-weight: 700; letter-spacing: 0.05em; }
+  .badge.teal { background: var(--accent2); }
+  .badge.orange { background: var(--accent3); }
+  .badge.purple { background: var(--accent4); color: #fff; }
+  .concept h2 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; }
+
+  .story { background: #111; border-left: 3px solid var(--accent); padding: 0.75rem 1rem; border-radius: 0 6px 6px 0; font-size: 0.88rem; color: #bbb; margin-bottom: 1rem; line-height: 1.6; }
+  .story strong { color: var(--accent); }
+  .story.teal { border-left-color: var(--accent2); }
+  .story.teal strong { color: var(--accent2); }
+  .story.orange { border-left-color: var(--accent3); }
+  .story.orange strong { color: var(--accent3); }
+  .story.purple { border-left-color: var(--accent4); }
+  .story.purple strong { color: var(--accent4); }
+
+  .playground { background: #111; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 0.75rem; }
+  .playground-top { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #0a0a0a; border-bottom: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #f87171; } .dot.y { background: #fbbf24; } .dot.g { background: #4ade80; }
+  .playground-body { padding: 1rem; }
+
+  .input-row { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .input-row label { font-size: 0.8rem; color: var(--muted); font-family: 'Space Mono', monospace; min-width: 70px; }
+  input[type="text"], input[type="number"], select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 0.45rem 0.8rem; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 0.85rem; flex: 1; min-width: 0; transition: border-color 0.2s; outline: none; }
+  input:focus, select:focus { border-color: var(--accent); }
+  .btn { padding: 0.45rem 1.1rem; border-radius: 6px; border: none; background: var(--accent); color: #0d0d0d; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: transform 0.1s, opacity 0.2s; white-space: nowrap; }
+  .btn:hover { opacity: 0.88; }
+  .btn:active { transform: scale(0.97); }
+  .btn.teal { background: var(--accent2); }
+  .btn.orange { background: var(--accent3); }
+  .btn.purple { background: var(--accent4); color: #fff; }
+  .btn.muted { background: var(--border); color: var(--text); }
+  .btn.red { background: var(--red); color: #fff; }
+
+  .output-label { font-size: 0.72rem; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 0.35rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  .output-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; font-family: 'Space Mono', monospace; font-size: 0.82rem; min-height: 2.5rem; line-height: 1.9; word-break: break-all; }
+  .output-box .key { color: var(--muted); }
+  .output-box .val { color: var(--accent); }
+  .output-box .val.teal { color: var(--accent2); }
+  .output-box .val.green { color: var(--green); }
+  .output-box .val.red { color: var(--red); }
+  .output-box .val.orange { color: var(--accent3); }
+  .output-box .val.purple { color: var(--accent4); }
+
+  /* Array Visual */
+  .array-visual { display: flex; gap: 4px; align-items: flex-start; flex-wrap: wrap; margin: 0.75rem 0; }
+  .arr-cell { display: flex; flex-direction: column; align-items: center; }
+  .arr-box { min-width: 44px; padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 5px; font-family: 'Space Mono', monospace; font-size: 0.8rem; text-align: center; background: var(--surface); transition: all 0.3s; }
+  .arr-box.highlight { background: rgba(240,224,64,0.15); border-color: var(--accent); color: var(--accent); }
+  .arr-box.new-item { background: rgba(74,222,128,0.15); border-color: var(--green); color: var(--green); }
+  .arr-box.removed { background: rgba(248,113,113,0.1); border-color: var(--red); color: var(--red); text-decoration: line-through; }
+  .arr-idx { font-size: 0.62rem; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+  /* Method grid */
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.5rem; margin-top: 0.75rem; }
+  .method-btn { padding: 0.5rem 0.75rem; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 0.78rem; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .method-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .method-btn.selected { border-color: var(--accent); background: rgba(240,224,64,0.08); color: var(--accent); }
+  .method-btn .desc { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 0.2rem; font-family: 'Syne', sans-serif; }
+  .method-btn.teal-btn:hover,.method-btn.teal-btn.selected { border-color: var(--accent2); color: var(--accent2); background: rgba(64,224,200,0.08); }
+  .method-btn.orange-btn:hover,.method-btn.orange-btn.selected { border-color: var(--accent3); color: var(--accent3); background: rgba(240,96,64,0.08); }
+
+  /* Compare box */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+  .compare-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+  .compare-card h4 { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .compare-card.good h4 { color: var(--green); }
+  .compare-card.bad h4 { color: var(--red); }
+  .compare-card p { font-size: 0.82rem; color: #bbb; line-height: 1.5; font-family: 'Space Mono', monospace; }
+
+  /* Challenge */
+  .challenge-box { background: rgba(240,224,64,0.04); border: 1px dashed var(--accent); border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem; }
+  .challenge-box.teal { background: rgba(64,224,200,0.04); border-color: var(--accent2); }
+  .challenge-box.orange { background: rgba(240,96,64,0.04); border-color: var(--accent3); }
+  .challenge-box.purple { background: rgba(167,139,250,0.04); border-color: var(--accent4); }
+  .challenge-box h3 { font-size: 0.88rem; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .challenge-box.teal h3 { color: var(--accent2); }
+  .challenge-box.orange h3 { color: var(--accent3); }
+  .challenge-box.purple h3 { color: var(--accent4); }
+  .challenge-box h3 { color: var(--accent); }
+  .challenge-box p { font-size: 0.87rem; color: #ccc; line-height: 1.55; margin-bottom: 0.75rem; }
+  .challenge-box pre { background: #111; border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.8rem; font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--accent2); margin-bottom: 0.75rem; overflow-x: auto; line-height: 1.6; }
+
+  .feedback { margin-top: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-family: 'Space Mono', monospace; display: none; line-height: 1.6; }
+  .feedback.show { display: block; }
+  .feedback.correct { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .feedback.wrong { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+  .feedback.hint { background: rgba(167,139,250,0.1); color: var(--accent4); border: 1px solid rgba(167,139,250,0.3); }
+
+  code { font-family: 'Space Mono', monospace; background: rgba(255,255,255,0.07); padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.88em; color: var(--accent2); }
+  .tip { font-size: 0.8rem; color: var(--muted); margin-top: 0.5rem; font-style: italic; line-height: 1.5; }
+
+  .section-divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+  .difficulty { display: inline-block; font-size: 0.68rem; font-family: 'Space Mono', monospace; padding: 0.15rem 0.5rem; border-radius: 3px; margin-left: 0.5rem; vertical-align: middle; font-weight: 700; letter-spacing: 0.05em; }
+  .difficulty.easy { background: rgba(74,222,128,0.15); color: var(--green); }
+  .difficulty.medium { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .difficulty.hard { background: rgba(248,113,113,0.15); color: var(--red); }
+  .difficulty.boss { background: rgba(167,139,250,0.15); color: var(--accent4); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media(max-width:600px){ .compare-grid{grid-template-columns:1fr;} }
+
+  .progress-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .progress-bar-wrap h3 { font-size: 0.9rem; margin-bottom: 0.75rem; }
+  .progress-track { background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 4px; transition: width 0.5s ease; }
+
+  .score-pill { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.75rem; font-size: 0.8rem; font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">JS<span>Lab</span></div>
+  <p style="color:var(--muted);font-size:0.85rem;">Arrays — Learn by Doing</p>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('basics', this)">📦 Basics</button>
+    <button class="tab" onclick="switchTab('methods', this)">🔧 Methods</button>
+    <button class="tab" onclick="switchTab('internals', this)">🧠 Internals</button>
+    <button class="tab" onclick="switchTab('challenges', this)">🎯 Challenges</button>
+  </div>
+</header>
+
+<!-- ═══════════════════ BASICS ═══════════════════ -->
+<div class="section active" id="basics">
+  <div class="section-title">Array <span>Basics</span></div>
+  <p class="section-sub">Arrays = a way to store many values in one variable. Like a train with many compartments.</p>
+
+  <!-- 1. Create -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge">01</span><h2>Creating & Reading an Array</h2></div>
+    <div class="story">
+      🎓 <strong>Real world:</strong> Instead of making 30 variables for 30 students' marks, you create <strong>one array</strong>. Think of it as a locker row — each locker has a number (index) starting from 0.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">create.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Items:</label>
+          <input type="text" id="create-input" value="85, 92, 78, 95, 60" placeholder="comma separated values">
+          <button class="btn" onclick="runCreate()">Create Array ▶</button>
+        </div>
+        <div class="output-label">// VISUAL + OUTPUT</div>
+        <div id="create-visual" class="array-visual"></div>
+        <div class="output-box" id="create-output">Click Create Array!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Push Pop -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge teal">02</span><h2>Push & Pop — Add/Remove from End</h2></div>
+    <div class="story teal">
+      📚 <strong>Real world:</strong> A <strong>stack of books</strong>. You always add/remove from the TOP (end). That's push and pop. These are the <strong>fastest</strong> operations on arrays — no other element has to move!
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">push-pop.js</span></div>
+      <div class="playground-body">
+        <div id="pushpop-visual" class="array-visual"></div>
+        <div class="input-row" style="margin-top:0.75rem">
+          <input type="text" id="push-val" placeholder="Value to push" value="99">
+          <button class="btn teal" onclick="doPush()">Push ➕</button>
+          <button class="btn orange" onclick="doPop()">Pop ➖</button>
+          <button class="btn muted" onclick="resetPushPop()">Reset</button>
+        </div>
+        <div class="output-label">// LOG</div>
+        <div class="output-box" id="pushpop-output">Use Push & Pop buttons above!</div>
+      </div>
+    </div>
+    <p class="tip">✅ Push/Pop are O(1) — instant, no shifting needed. Always prefer these for performance.</p>
+  </div>
+
+  <!-- 3. Shift Unshift -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge orange">03</span><h2>Shift & Unshift — Add/Remove from Start</h2></div>
+    <div class="story orange">
+      🚌 <strong>Real world:</strong> Imagine a bus queue. Someone cuts the front — everyone behind has to shuffle back. That's unshift. Someone at front leaves — everyone shifts forward. That's shift. <strong>Expensive!</strong> Every element has to move.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">shift-unshift.js</span></div>
+      <div class="playground-body">
+        <div id="shiftunshift-visual" class="array-visual"></div>
+        <div class="input-row" style="margin-top:0.75rem">
+          <input type="text" id="unshift-val" placeholder="Value to unshift" value="11">
+          <button class="btn orange" onclick="doUnshift()">Unshift ⬅️ Add to Start</button>
+          <button class="btn muted" onclick="doShift()">Shift ❌ Remove from Start</button>
+          <button class="btn muted" onclick="resetShiftUnshift()">Reset</button>
+        </div>
+        <div class="output-label">// LOG</div>
+        <div class="output-box" id="shiftunshift-output">Try the operations! Notice all indexes update.</div>
+      </div>
+    </div>
+    <p class="tip">⚠️ Avoid .unshift()/.shift() on large arrays — O(n) cost. Every element has to re-index.</p>
+  </div>
+
+  <!-- 4. Iteration -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge">04</span><h2>Looping Through Arrays</h2></div>
+    <div class="story">
+      📊 <strong>Real world:</strong> Showing all items in a shopping cart, or all students' marks — you need to <strong>loop</strong>. Two main ways: classic <code>for</code> (gives you index) and modern <code>for...of</code> (gives you values directly).
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">loop.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Array:</label>
+          <input type="text" id="loop-input" value="10, 20, 30, 40, 50" placeholder="comma separated">
+          <select id="loop-type" style="max-width:160px">
+            <option value="for">Classic for loop</option>
+            <option value="forof">for...of loop</option>
+          </select>
+          <button class="btn" onclick="runLoop()">Run ▶</button>
+        </div>
+        <div class="output-label">// OUTPUT</div>
+        <div class="output-box" id="loop-output">Select a loop type and run!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ METHODS ═══════════════════ -->
+<div class="section" id="methods">
+  <div class="section-title">Array <span>Methods</span></div>
+  <p class="section-sub">The toolkit every JS developer uses daily. Try each one live.</p>
+
+  <!-- Slice vs Splice -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge">01</span><h2>slice() vs splice() — The Most Confused Pair</h2></div>
+    <div class="story">
+      ✂️ <strong>Real world:</strong> <strong>slice()</strong> = photocopying pages from a book — original unchanged. <strong>splice()</strong> = actually tearing pages out — original is modified forever.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">slice-vs-splice.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Array:</label>
+          <input type="text" id="ss-input" value="10, 20, 30, 40, 50, 60">
+          <label>Start:</label>
+          <input type="number" id="ss-start" value="1" style="max-width:60px">
+          <label>End/Count:</label>
+          <input type="number" id="ss-end" value="3" style="max-width:60px">
+          <input type="text" id="ss-insert" placeholder="insert (splice only)" style="max-width:150px">
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button class="btn" onclick="runSlice()">slice() — non-destructive</button>
+          <button class="btn orange" onclick="runSplice()">splice() — mutates!</button>
+          <button class="btn muted" onclick="resetSS()">Reset Array</button>
+        </div>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// RESULT</div>
+          <div class="output-box" id="ss-output">Pick slice or splice above!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concat & Spread -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge teal">02</span><h2>Concat & Spread — Merging Arrays</h2></div>
+    <div class="story teal">
+      🛒 <strong>Real world:</strong> You have two shopping lists and want to combine them. <strong>concat()</strong> is the classic way. The <strong>spread operator (...)</strong> is the modern way — it "unpacks" the array like spilling items onto a table.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">merge.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Array 1:</label>
+          <input type="text" id="merge-a" value="1, 2, 3">
+          <label>Array 2:</label>
+          <input type="text" id="merge-b" value="4, 5, 6">
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button class="btn teal" onclick="runConcat()">concat() ▶</button>
+          <button class="btn" onclick="runSpread()">spread [...a, ...b] ▶</button>
+        </div>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// RESULT</div>
+          <div class="output-box" id="merge-output">Try both methods!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sort -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge orange">03</span><h2>sort() — The Tricky One</h2></div>
+    <div class="story orange">
+      ⚠️ <strong>Real world trap:</strong> You sort prices [100, 32, 5, 200] and get [100, 200, 32, 5]. <strong>That's wrong!</strong> Default sort treats everything as strings and compares character by character (like a dictionary). "1" comes before "3" so "100" beats "32". You need a custom comparator for numbers.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">sort.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Array:</label>
+          <input type="text" id="sort-input" value="100, 32, 5, 200, 15">
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button class="btn red" onclick="runDefaultSort()">Default sort() 😱</button>
+          <button class="btn teal" onclick="runNumSortAsc()">Numeric Ascending ↑</button>
+          <button class="btn" onclick="runNumSortDesc()">Numeric Descending ↓</button>
+          <button class="btn muted" onclick="runReverse()">reverse()</button>
+        </div>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// RESULT</div>
+          <div class="output-box" id="sort-output">Try default sort first — then see the fix!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flat, Join, indexOf -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge purple">04</span><h2>More Methods — Flat, Join, Search</h2></div>
+    <div class="story purple">
+      🏗️ <strong>Real world:</strong> <strong>flat()</strong> is like opening a bag of bags into one big bag. <strong>join()</strong> converts your array to a string with a separator — like exporting CSV. <strong>indexOf/includes</strong> are search tools.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">misc.js</span></div>
+      <div class="playground-body">
+        <div class="input-row">
+          <label>Input:</label>
+          <input type="text" id="misc-input" value="1, 2, [3, 4, [5, 6]]" placeholder="can include nested arrays">
+          <input type="text" id="misc-arg" placeholder="arg (join sep / search val / depth)" style="max-width:200px">
+        </div>
+        <div class="method-grid">
+          <button class="method-btn" onclick="runMisc('flat1')">flat() <span class="desc">flatten 1 level</span></button>
+          <button class="method-btn" onclick="runMisc('flatInf')">flat(Infinity) <span class="desc">flatten all levels</span></button>
+          <button class="method-btn teal-btn" onclick="runMisc('join')">join() <span class="desc">array → string</span></button>
+          <button class="method-btn teal-btn" onclick="runMisc('toString')">toString() <span class="desc">simple conversion</span></button>
+          <button class="method-btn orange-btn" onclick="runMisc('indexOf')">indexOf() <span class="desc">find position</span></button>
+          <button class="method-btn orange-btn" onclick="runMisc('lastIndexOf')">lastIndexOf() <span class="desc">find last pos</span></button>
+          <button class="method-btn orange-btn" onclick="runMisc('includes')">includes() <span class="desc">true/false search</span></button>
+        </div>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// RESULT</div>
+          <div class="output-box" id="misc-output">Click a method!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ INTERNALS ═══════════════════ -->
+<div class="section" id="internals">
+  <div class="section-title">Array <span>Internals</span></div>
+  <p class="section-sub">Why JavaScript arrays are NOT what you think — and why it matters.</p>
+
+  <!-- typeof -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge orange">01</span><h2>typeof Array = "object" — Wait, what?!</h2></div>
+    <div class="story orange">
+      🤯 <strong>Real world:</strong> This surprises everyone. In JavaScript, arrays are secretly just <strong>objects</strong> with numbered keys. Like a dictionary where key "0" holds the first value, "1" holds second, etc. That's why <code>typeof []</code> returns <strong>"object"</strong>, not "array"!
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">typeof.js</span></div>
+      <div class="playground-body">
+        <button class="btn orange" onclick="runTypeof()">Reveal the Truth ▶</button>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// OUTPUT</div>
+          <div class="output-box" id="typeof-output">Click to see what typeof really returns!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mixed types -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge">02</span><h2>Mixed Types — JS vs C++/Java</h2></div>
+    <div class="story">
+      🌍 <strong>Real world:</strong> In C++/Java, an int array can only hold integers — strict! JavaScript doesn't care. You can mix numbers, strings, booleans, even other arrays in one array. This is possible because JS arrays are <strong>objects under the hood</strong>, not fixed-memory blocks.
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">mixed.js</span></div>
+      <div class="playground-body">
+        <button class="btn" onclick="runMixed()">Show Mixed Array ▶</button>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// OUTPUT</div>
+          <div class="output-box" id="mixed-output">Click to see a JavaScript array with mixed types!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-grid" style="margin-top:1rem">
+      <div class="compare-card good">
+        <h4>✅ JavaScript Array</h4>
+        <p>[42, "hello", true, null, {x:1}]<br><br>✓ Mixed types OK<br>✓ Dynamic size<br>✓ Object internally<br>✓ Flexible</p>
+      </div>
+      <div class="compare-card bad">
+        <h4>🔒 C++ / Java Array</h4>
+        <p>int arr[5] = {1,2,3,4,5};<br><br>✗ Same type only<br>✗ Fixed size<br>✓ Contiguous memory<br>✓ Faster direct access</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reference vs Value -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge teal">03</span><h2>Reference vs Value — The Sneaky Bug</h2></div>
+    <div class="story teal">
+      🔗 <strong>Real world:</strong> When you copy a Google Doc link and share it — both of you see the <strong>same document</strong>. Editing it changes it for both. That's how array assignment works in JS! <strong>Primitives</strong> (numbers, strings) copy the value. <strong>Arrays/objects</strong> copy the reference (the link).
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">reference.js</span></div>
+      <div class="playground-body">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button class="btn teal" onclick="runReference()">Show Reference Bug ▶</button>
+          <button class="btn" onclick="runValueCopy()">Primitive (Value Copy) ▶</button>
+        </div>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// OUTPUT</div>
+          <div class="output-box" id="reference-output">Click to see the difference!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- const with array -->
+  <div class="concept">
+    <div class="concept-header"><span class="badge purple">04</span><h2>const Array — Not What You Think</h2></div>
+    <div class="story purple">
+      🔐 <strong>Real world:</strong> Think of <code>const arr</code> as a <strong>locked address</strong> to an apartment. You can't move to a new apartment (change the reference), but you can fully redecorate inside (change elements). The address is locked, not the apartment!
+    </div>
+    <div class="playground">
+      <div class="playground-top"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><span style="margin-left:0.5rem">const-array.js</span></div>
+      <div class="playground-body">
+        <button class="btn purple" onclick="runConst()">Show const Behavior ▶</button>
+        <div style="margin-top:0.75rem">
+          <div class="output-label">// OUTPUT</div>
+          <div class="output-box" id="const-output">Click to understand const with arrays!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CHALLENGES ═══════════════════ -->
+<div class="section" id="challenges">
+  <div class="section-title">🎯 <span>Challenges</span></div>
+  <p class="section-sub">10 challenges. Depth increases with each level. No skipping!</p>
+
+  <div class="progress-bar-wrap">
+    <h3>Progress — <span id="score-text">0 / 10 solved</span></h3>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+      <span class="difficulty easy">EASY 1–3</span>
+      <span class="difficulty medium">MEDIUM 4–6</span>
+      <span class="difficulty hard">HARD 7–9</span>
+      <span class="difficulty boss">BOSS 10</span>
+    </div>
+  </div>
+
+  <!-- C1 -->
+  <div class="challenge-box" id="cb1">
+    <h3>Challenge 1 <span class="difficulty easy">EASY</span> — Add to Cart</h3>
+    <p>You have a cart: <code>["Shoes", "Shirt"]</code>. A user adds "Jeans". Which method do you use to add to the <strong>end</strong>?</p>
+    <div class="input-row">
+      <input type="text" id="c1-input" placeholder='method name only (e.g. push)'>
+      <button class="btn" onclick="checkC(1)">Check ✓</button>
+      <button class="btn muted" onclick="hint(1)">Hint</button>
+    </div>
+    <div class="feedback" id="c1-fb"></div>
+  </div>
+
+  <!-- C2 -->
+  <div class="challenge-box teal" id="cb2">
+    <h3>Challenge 2 <span class="difficulty easy">EASY</span> — Last Element</h3>
+    <p>Given <code>let marks = [85, 92, 78, 95]</code>, what's the JS code to get the <strong>last element</strong> without hardcoding the index?</p>
+    <div class="input-row">
+      <input type="text" id="c2-input" placeholder='e.g. marks[...]'>
+      <button class="btn teal" onclick="checkC(2)">Check ✓</button>
+      <button class="btn muted" onclick="hint(2)">Hint</button>
+    </div>
+    <div class="feedback" id="c2-fb"></div>
+  </div>
+
+  <!-- C3 -->
+  <div class="challenge-box" id="cb3">
+    <h3>Challenge 3 <span class="difficulty easy">EASY</span> — Roster Count</h3>
+    <p>A teacher has <code>let students = ["Ali", "Priya", "Sam", "Leo"]</code>. How do they count the number of students? Type the expression.</p>
+    <div class="input-row">
+      <input type="text" id="c3-input" placeholder='e.g. students.???'>
+      <button class="btn" onclick="checkC(3)">Check ✓</button>
+      <button class="btn muted" onclick="hint(3)">Hint</button>
+    </div>
+    <div class="feedback" id="c3-fb"></div>
+  </div>
+
+  <!-- C4 -->
+  <div class="challenge-box orange" id="cb4">
+    <h3>Challenge 4 <span class="difficulty medium">MEDIUM</span> — Price Sort Gone Wrong</h3>
+    <p>A developer sorts prices: <code>[100, 32, 5, 200].sort()</code> and gets <code>[100, 200, 32, 5]</code>. <strong>Why is this wrong?</strong> And how do you fix it for ascending order? Type the fix.</p>
+    <div class="input-row">
+      <input type="text" id="c4-input" placeholder='.sort(???)'>
+      <button class="btn orange" onclick="checkC(4)">Check ✓</button>
+      <button class="btn muted" onclick="hint(4)">Hint</button>
+    </div>
+    <div class="feedback" id="c4-fb"></div>
+  </div>
+
+  <!-- C5 -->
+  <div class="challenge-box" id="cb5">
+    <h3>Challenge 5 <span class="difficulty medium">MEDIUM</span> — Non-Destructive Extract</h3>
+    <p>You have <code>let fruits = ["apple","banana","cherry","date","elderberry"]</code>. Extract indices 1 to 3 (banana, cherry, date) WITHOUT modifying the original. Which method? Write it.</p>
+    <div class="input-row">
+      <input type="text" id="c5-input" placeholder='fruits.???(1, 4)'>
+      <button class="btn" onclick="checkC(5)">Check ✓</button>
+      <button class="btn muted" onclick="hint(5)">Hint</button>
+    </div>
+    <div class="feedback" id="c5-fb"></div>
+  </div>
+
+  <!-- C6 -->
+  <div class="challenge-box teal" id="cb6">
+    <h3>Challenge 6 <span class="difficulty medium">MEDIUM</span> — Merge Without Nesting</h3>
+    <p>You have two arrays: <code>a = [1,2,3]</code> and <code>b = [4,5,6]</code>. A junior dev wrote <code>[a, b]</code> and got <code>[[1,2,3],[4,5,6]]</code> — nested! Write the correct modern way to merge them flat.</p>
+    <div class="input-row">
+      <input type="text" id="c6-input" placeholder='[...???]'>
+      <button class="btn teal" onclick="checkC(6)">Check ✓</button>
+      <button class="btn muted" onclick="hint(6)">Hint</button>
+    </div>
+    <div class="feedback" id="c6-fb"></div>
+  </div>
+
+  <!-- C7 -->
+  <div class="challenge-box orange" id="cb7">
+    <h3>Challenge 7 <span class="difficulty hard">HARD</span> — Reference Trap</h3>
+    <p>What does this code print?</p>
+    <pre>let a = [1, 2, 3];
+let b = a;
+b.push(4);
+console.log(a);</pre>
+    <p>Type the output exactly (as an array).</p>
+    <div class="input-row">
+      <input type="text" id="c7-input" placeholder='[?, ?, ?, ?]'>
+      <button class="btn orange" onclick="checkC(7)">Check ✓</button>
+      <button class="btn muted" onclick="hint(7)">Hint</button>
+    </div>
+    <div class="feedback" id="c7-fb"></div>
+  </div>
+
+  <!-- C8 -->
+  <div class="challenge-box" id="cb8">
+    <h3>Challenge 8 <span class="difficulty hard">HARD</span> — Flatten the Chaos</h3>
+    <p>You get API data that looks like <code>[1, [2, 3], [4, [5, [6]]]]</code>. You need it completely flat: <code>[1,2,3,4,5,6]</code>. What single method call achieves this?</p>
+    <div class="input-row">
+      <input type="text" id="c8-input" placeholder='arr.???(???)'>
+      <button class="btn" onclick="checkC(8)">Check ✓</button>
+      <button class="btn muted" onclick="hint(8)">Hint</button>
+    </div>
+    <div class="feedback" id="c8-fb"></div>
+  </div>
+
+  <!-- C9 -->
+  <div class="challenge-box purple" id="cb9">
+    <h3>Challenge 9 <span class="difficulty hard">HARD</span> — const Confusion</h3>
+    <p>Which of these causes an error?</p>
+    <pre>const arr = [1, 2, 3];
+
+// Operation A:
+arr.push(4);
+
+// Operation B:
+arr = [1, 2, 3, 4];</pre>
+    <p>Type <strong>A</strong>, <strong>B</strong>, or <strong>Both</strong>.</p>
+    <div class="input-row">
+      <input type="text" id="c9-input" placeholder='A, B, or Both'>
+      <button class="btn purple" onclick="checkC(9)">Check ✓</button>
+      <button class="btn muted" onclick="hint(9)">Hint</button>
+    </div>
+    <div class="feedback" id="c9-fb"></div>
+  </div>
+
+  <!-- C10 BOSS -->
+  <div class="challenge-box purple" id="cb10">
+    <h3>Challenge 10 <span class="difficulty boss">BOSS</span> — The Splice Mission</h3>
+    <p>You have a task list:</p>
+    <pre>let tasks = ["Email", "Meeting", "Lunch", "Code Review", "Deploy"];</pre>
+    <p>Requirements in ONE splice call:<br>
+    • Remove "Meeting" and "Lunch" (indices 1 and 2)<br>
+    • Insert "Standup" and "Design Review" in their place<br><br>
+    Write the complete splice call.</p>
+    <div class="input-row">
+      <input type="text" id="c10-input" placeholder='tasks.splice(???)'>
+      <button class="btn purple" onclick="checkC(10)">Check ✓</button>
+      <button class="btn muted" onclick="hint(10)">Hint</button>
+    </div>
+    <div class="feedback" id="c10-fb"></div>
+  </div>
+
+  <div style="margin-top:2rem;padding:1.5rem;background:var(--card);border-radius:12px;border:1px solid var(--border);text-align:center">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem" id="trophy-emoji">🎯</div>
+    <div id="final-score" style="font-size:1.4rem;font-weight:800;color:var(--accent)">Score: 0 / 10</div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-top:0.4rem" id="score-msg">Complete challenges to level up your array skills!</p>
+  </div>
+</div>
+
+<script>
+// ── TABS ──
+function switchTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── HELPERS ──
+function parseArr(str) {
+  try {
+    const val = JSON.parse('[' + str.replace(/\[/g,'[').replace(/\]/g,']') + ']');
+    return val;
+  } catch(e) {
+    return str.split(',').map(s => {
+      s = s.trim();
+      if(!isNaN(s) && s !== '') return Number(s);
+      return s;
+    });
+  }
+}
+
+function renderVisual(arr, containerId, highlightIdx=-1, newIdx=-1, removedIdx=-1) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = arr.map((v,i) => `
+    <div class="arr-cell">
+      <div class="arr-box ${i===highlightIdx?'highlight':''} ${i===newIdx?'new-item':''} ${i===removedIdx?'removed':''}">${v}</div>
+      <div class="arr-idx">[${i}]</div>
+    </div>
+  `).join('') + `<div class="arr-cell" style="margin-left:6px"><div style="color:var(--muted);font-family:Space Mono,monospace;font-size:0.75rem;padding-top:10px">.length = ${arr.length}</div></div>`;
+}
+
+// ── CREATE ──
+function runCreate() {
+  const arr = parseArr(document.getElementById('create-input').value);
+  renderVisual(arr, 'create-visual');
+  document.getElementById('create-output').innerHTML = `
+<span class="key">let marks = [${arr.map(v=>JSON.stringify(v)).join(', ')}];</span><br><br>
+<span class="key">marks.length  → </span><span class="val">${arr.length}</span><br>
+<span class="key">marks[0]      → </span><span class="val green">${JSON.stringify(arr[0])}</span><span class="key"> (first element)</span><br>
+<span class="key">marks[${arr.length-1}]      → </span><span class="val green">${JSON.stringify(arr[arr.length-1])}</span><span class="key"> (last element)</span><br>
+<span class="key">typeof marks  → </span><span class="val orange">"object"</span><span class="key"> (not "array"!)</span>`;
+}
+
+// ── PUSH POP ──
+let ppArr = [10, 20, 30, 40];
+function refreshPP() { renderVisual(ppArr, 'pushpop-visual'); }
+function doPush() {
+  const v = document.getElementById('push-val').value.trim();
+  const val = isNaN(v) ? v : Number(v);
+  ppArr.push(val);
+  renderVisual(ppArr, 'pushpop-visual', -1, ppArr.length-1);
+  document.getElementById('pushpop-output').innerHTML = `<span class="key">arr.push(${JSON.stringify(val)})</span><br><span class="key">→ arr is now: </span><span class="val green">[${ppArr.join(', ')}]</span><br><span class="key">length: </span><span class="val">${ppArr.length}</span>`;
+}
+function doPop() {
+  if(!ppArr.length){document.getElementById('pushpop-output').innerHTML='<span class="val red">Array is empty!</span>';return;}
+  const removed = ppArr.pop();
+  renderVisual(ppArr, 'pushpop-visual');
+  document.getElementById('pushpop-output').innerHTML = `<span class="key">arr.pop()</span><br><span class="key">→ Removed: </span><span class="val orange">${JSON.stringify(removed)}</span><br><span class="key">→ arr is now: </span><span class="val green">[${ppArr.join(', ')}]</span>`;
+}
+function resetPushPop() { ppArr = [10,20,30,40]; refreshPP(); document.getElementById('pushpop-output').innerHTML='Reset! Use Push & Pop buttons.'; }
+
+// ── SHIFT UNSHIFT ──
+let suArr = [10, 20, 30, 40];
+function refreshSU() { renderVisual(suArr, 'shiftunshift-visual'); }
+function doUnshift() {
+  const v = document.getElementById('unshift-val').value.trim();
+  const val = isNaN(v) ? v : Number(v);
+  suArr.unshift(val);
+  renderVisual(suArr, 'shiftunshift-visual', -1, 0);
+  document.getElementById('shiftunshift-output').innerHTML = `<span class="key">arr.unshift(${JSON.stringify(val)})</span><br><span class="val green">[${suArr.join(', ')}]</span><br><span class="key">⚠️ ALL ${suArr.length-1} existing elements had to shift right! Expensive for large arrays.</span>`;
+}
+function doShift() {
+  if(!suArr.length){document.getElementById('shiftunshift-output').innerHTML='<span class="val red">Array is empty!</span>';return;}
+  const removed = suArr.shift();
+  renderVisual(suArr, 'shiftunshift-visual');
+  document.getElementById('shiftunshift-output').innerHTML = `<span class="key">arr.shift()</span><br><span class="key">→ Removed: </span><span class="val orange">${JSON.stringify(removed)}</span><br><span class="val green">[${suArr.join(', ')}]</span><br><span class="key">⚠️ All remaining elements had to re-index!</span>`;
+}
+function resetShiftUnshift() { suArr=[10,20,30,40]; refreshSU(); document.getElementById('shiftunshift-output').innerHTML='Reset!'; }
+
+// ── LOOP ──
+function runLoop() {
+  const arr = parseArr(document.getElementById('loop-input').value);
+  const type = document.getElementById('loop-type').value;
+  let out = '';
+  if(type === 'for') {
+    out = `<span class="key">for (let i = 0; i < arr.length; i++) {</span><br>`;
+    arr.forEach((v,i) => { out += `&nbsp;&nbsp;<span class="key">// i=${i} → </span><span class="val">arr[${i}] = ${JSON.stringify(v)}</span><br>`; });
+    out += `<span class="key">}</span>`;
+  } else {
+    out = `<span class="key">for (let item of arr) {</span><br>`;
+    arr.forEach(v => { out += `&nbsp;&nbsp;<span class="key">// item = </span><span class="val teal">${JSON.stringify(v)}</span><br>`; });
+    out += `<span class="key">}</span><br><span class="key">// for...of gives values directly, no index needed</span>`;
+  }
+  document.getElementById('loop-output').innerHTML = out;
+}
+
+// ── SLICE vs SPLICE ──
+let ssArr = [10,20,30,40,50,60];
+function resetSS(){ ssArr = parseArr(document.getElementById('ss-input').value); renderVisual(ssArr,'create-visual'); document.getElementById('ss-output').innerHTML='Array reset!'; }
+function runSlice() {
+  const arr = parseArr(document.getElementById('ss-input').value);
+  const s = parseInt(document.getElementById('ss-start').value)||0;
+  const e = parseInt(document.getElementById('ss-end').value)||3;
+  const result = arr.slice(s,e);
+  document.getElementById('ss-output').innerHTML = `
+<span class="key">arr.slice(${s}, ${e})</span><br>
+<span class="key">→ Result (NEW array): </span><span class="val green">[${result.join(', ')}]</span><br>
+<span class="key">→ Original unchanged: </span><span class="val teal">[${arr.join(', ')}]</span><br>
+<span class="key">// slice never touches the original ✅</span>`;
+}
+function runSplice() {
+  let arr = parseArr(document.getElementById('ss-input').value);
+  const s = parseInt(document.getElementById('ss-start').value)||0;
+  const c = parseInt(document.getElementById('ss-end').value)||1;
+  const ins = document.getElementById('ss-insert').value;
+  const insertItems = ins ? ins.split(',').map(x=>x.trim()).map(x=>isNaN(x)?x:Number(x)) : [];
+  const removed = arr.splice(s, c, ...insertItems);
+  document.getElementById('ss-output').innerHTML = `
+<span class="key">arr.splice(${s}, ${c}${insertItems.length?', '+insertItems.map(v=>JSON.stringify(v)).join(', '):''})</span><br>
+<span class="key">→ Removed: </span><span class="val red">[${removed.join(', ')}]</span><br>
+<span class="key">→ Original MUTATED to: </span><span class="val orange">[${arr.join(', ')}]</span><br>
+<span class="key">// splice modifies the original! ⚠️</span>`;
+}
+
+// ── CONCAT SPREAD ──
+function runConcat() {
+  const a = parseArr(document.getElementById('merge-a').value);
+  const b = parseArr(document.getElementById('merge-b').value);
+  const result = a.concat(b);
+  document.getElementById('merge-output').innerHTML = `
+<span class="key">a.concat(b)</span><br>
+<span class="key">→ </span><span class="val green">[${result.join(', ')}]</span><br>
+<span class="key">// Classic way. Both originals untouched.</span>`;
+}
+function runSpread() {
+  const a = parseArr(document.getElementById('merge-a').value);
+  const b = parseArr(document.getElementById('merge-b').value);
+  const result = [...a, ...b];
+  document.getElementById('merge-output').innerHTML = `
+<span class="key">[...a, ...b]</span><br>
+<span class="key">→ </span><span class="val teal">[${result.join(', ')}]</span><br>
+<span class="key">// Modern way. You can also add items: [...a, 99, ...b]</span><br>
+<span class="key">// Spread "unpacks" each array and puts them inline 🔥</span>`;
+}
+
+// ── SORT ──
+function runDefaultSort() {
+  const arr = parseArr(document.getElementById('sort-input').value);
+  const sorted = [...arr].sort();
+  document.getElementById('sort-output').innerHTML = `
+<span class="key">arr.sort() — DEFAULT (lexicographic / ASCII)</span><br>
+<span class="key">Before: </span><span class="val">[${arr.join(', ')}]</span><br>
+<span class="key">After:  </span><span class="val red">[${sorted.join(', ')}]</span><br><br>
+<span class="key">// WHY? "100" < "32" because "1" (ASCII 49) < "3" (ASCII 51)</span><br>
+<span class="key">// It's comparing CHARACTERS, not NUMBERS 😱</span>`;
+}
+function runNumSortAsc() {
+  const arr = parseArr(document.getElementById('sort-input').value);
+  const sorted = [...arr].sort((a,b) => a-b);
+  document.getElementById('sort-output').innerHTML = `
+<span class="key">arr.sort((a, b) => a - b) — NUMERIC ASCENDING</span><br>
+<span class="key">Before: </span><span class="val">[${arr.join(', ')}]</span><br>
+<span class="key">After:  </span><span class="val green">[${sorted.join(', ')}]</span><br><br>
+<span class="key">// (a - b) < 0 → a comes first | (a - b) > 0 → b comes first</span><br>
+<span class="key">// This forces actual NUMBER comparison ✅</span>`;
+}
+function runNumSortDesc() {
+  const arr = parseArr(document.getElementById('sort-input').value);
+  const sorted = [...arr].sort((a,b) => b-a);
+  document.getElementById('sort-output').innerHTML = `
+<span class="key">arr.sort((a, b) => b - a) — NUMERIC DESCENDING</span><br>
+<span class="key">Before: </span><span class="val">[${arr.join(', ')}]</span><br>
+<span class="key">After:  </span><span class="val teal">[${sorted.join(', ')}]</span><br><br>
+<span class="key">// Flip a & b to reverse the order!</span>`;
+}
+function runReverse() {
+  const arr = parseArr(document.getElementById('sort-input').value);
+  const result = [...arr].reverse();
+  document.getElementById('sort-output').innerHTML = `
+<span class="key">arr.reverse()</span><br>
+<span class="key">Before: </span><span class="val">[${arr.join(', ')}]</span><br>
+<span class="key">After:  </span><span class="val purple">[${result.join(', ')}]</span><br>
+<span class="key">// Reverses in-place (mutates original). Use [...arr].reverse() to avoid mutation.</span>`;
+}
+
+// ── MISC ──
+function runMisc(type) {
+  const raw = document.getElementById('misc-input').value.trim();
+  const arg = document.getElementById('misc-arg').value.trim();
+  let arr, result, code;
+  try { arr = JSON.parse('[' + raw + ']'); } catch(e) { arr = parseArr(raw); }
+  try {
+    if(type==='flat1'){result=arr.flat(1);code=`arr.flat()`;}
+    else if(type==='flatInf'){result=arr.flat(Infinity);code=`arr.flat(Infinity)`;}
+    else if(type==='join'){const sep=arg||',';result=arr.flat(Infinity).join(sep);code=`arr.flat(Infinity).join("${sep}")`;}
+    else if(type==='toString'){result=arr.toString();code=`arr.toString()`;}
+    else if(type==='indexOf'){const s=arg?isNaN(arg)?arg:Number(arg):arr[0];result=arr.indexOf(s);code=`arr.indexOf(${JSON.stringify(s)})`;}
+    else if(type==='lastIndexOf'){const s=arg?isNaN(arg)?arg:Number(arg):arr[0];result=arr.lastIndexOf(s);code=`arr.lastIndexOf(${JSON.stringify(s)})`;}
+    else if(type==='includes'){const s=arg?isNaN(arg)?arg:Number(arg):arr[0];result=arr.includes(s);code=`arr.includes(${JSON.stringify(s)})`;}
+    document.getElementById('misc-output').innerHTML = `
+<span class="key">${code}</span><br>
+<span class="key">Input:  </span><span class="val">${JSON.stringify(arr)}</span><br>
+<span class="key">Result: </span><span class="val green">${JSON.stringify(result)}</span>`;
+  } catch(e) {
+    document.getElementById('misc-output').innerHTML = `<span class="val red">Error: ${e.message}</span>`;
+  }
+}
+
+// ── INTERNALS ──
+function runTypeof() {
+  document.getElementById('typeof-output').innerHTML = `
+<span class="key">let arr = [1, 2, 3];</span><br><br>
+<span class="key">typeof arr          → </span><span class="val red">"object"</span><span class="key">  ← NOT "array"!</span><br>
+<span class="key">Array.isArray(arr)  → </span><span class="val green">true</span><span class="key">   ← correct way to check</span><br>
+<span class="key">arr instanceof Array→ </span><span class="val green">true</span><br><br>
+<span class="key">// Why? Arrays in JS are special OBJECTS internally.</span><br>
+<span class="key">// Keys are the indices: { "0":1, "1":2, "2":3, length:3 }</span><br>
+<span class="key">// Use Array.isArray() when you need to type-check! 🔑</span>`;
+}
+
+function runMixed() {
+  document.getElementById('mixed-output').innerHTML = `
+<span class="key">// JS allows ANY types in one array:</span><br>
+<span class="key">let mixed = [42, "hello", true, null, {name:"Rohit"}, [1,2]];</span><br><br>
+<span class="val">mixed[0]</span><span class="key"> → </span><span class="val green">42</span><span class="key"> (number)</span><br>
+<span class="val">mixed[1]</span><span class="key"> → </span><span class="val green">"hello"</span><span class="key"> (string)</span><br>
+<span class="val">mixed[2]</span><span class="key"> → </span><span class="val green">true</span><span class="key"> (boolean)</span><br>
+<span class="val">mixed[3]</span><span class="key"> → </span><span class="val orange">null</span><span class="key"> (null)</span><br>
+<span class="val">mixed[4]</span><span class="key"> → </span><span class="val teal">{name: "Rohit"}</span><span class="key"> (object)</span><br>
+<span class="val">mixed[5]</span><span class="key"> → </span><span class="val purple">[1, 2]</span><span class="key"> (nested array)</span><br><br>
+<span class="key">// In C++: int arr[] = {42, "hello",...} ❌ COMPILE ERROR</span><br>
+<span class="key">// In JS: totally fine! Because arrays are objects. ✅</span>`;
+}
+
+function runReference() {
+  document.getElementById('reference-output').innerHTML = `
+<span class="key">// 🔗 REFERENCE COPY (arrays)</span><br>
+<span class="key">let a = [1, 2, 3];</span><br>
+<span class="key">let b = a;         </span><span class="val orange">// b points to SAME array in memory</span><br>
+<span class="key">b.push(4);</span><br>
+<span class="key">console.log(a);    </span><span class="val red">// [1,2,3,4] ← a changed too! 😱</span><br>
+<span class="key">console.log(b);    </span><span class="val red">// [1,2,3,4] ← same thing</span><br><br>
+<span class="key">// ✅ FIX — make a real copy:</span><br>
+<span class="key">let c = [...a];    </span><span class="val green">// spread copy</span><br>
+<span class="key">let d = a.slice(); </span><span class="val green">// slice copy</span><br>
+<span class="key">// Now c and d are independent arrays 🎉</span>`;
+}
+
+function runValueCopy() {
+  document.getElementById('reference-output').innerHTML = `
+<span class="key">// 📦 VALUE COPY (primitives)</span><br>
+<span class="key">let x = 10;</span><br>
+<span class="key">let y = x;  </span><span class="val green">// y gets a COPY of value 10</span><br>
+<span class="key">y = 99;</span><br>
+<span class="key">console.log(x); </span><span class="val green">// 10 ← x unchanged! ✅</span><br>
+<span class="key">console.log(y); </span><span class="val teal">// 99</span><br><br>
+<span class="key">// Numbers, strings, booleans → copied by VALUE</span><br>
+<span class="key">// Arrays, Objects → copied by REFERENCE (the "link")</span>`;
+}
+
+function runConst() {
+  document.getElementById('const-output').innerHTML = `
+<span class="key">const arr = [1, 2, 3];</span><br><br>
+<span class="key">// ✅ Allowed — modifying contents:</span><br>
+<span class="key">arr.push(4);   </span><span class="val green">// [1,2,3,4] — works fine</span><br>
+<span class="key">arr[0] = 99;   </span><span class="val green">// [99,2,3,4] — works fine</span><br>
+<span class="key">arr.pop();     </span><span class="val green">// [99,2,3] — works fine</span><br><br>
+<span class="key">// ❌ NOT Allowed — changing the reference:</span><br>
+<span class="key">arr = [1,2,3]; </span><span class="val red">// TypeError: Assignment to constant variable!</span><br><br>
+<span class="key">// Think of const as a locked POINTER, not a locked VALUE.</span><br>
+<span class="key">// The address is fixed. The apartment (contents) can change. 🏠</span>`;
+}
+
+// ── CHALLENGES ──
+let solved = {};
+function updateScore() {
+  const s = Object.keys(solved).length;
+  document.getElementById('score-text').textContent = `${s} / 10 solved`;
+  document.getElementById('final-score').textContent = `Score: ${s} / 10`;
+  document.getElementById('progress-fill').style.width = (s*10)+'%';
+  const msgs = ['Complete challenges to level up!','Keep going!','Warming up!','Nice work!','Halfway there!','More than halfway!','Almost there, keep pushing!','Just a few left!','One more to go!','🏆 All done! Array master!'];
+  document.getElementById('score-msg').textContent = msgs[s];
+  const emojis = ['🎯','🎯','🔥','🔥','💪','💪','⚡','⚡','🚀','🏆','🏆'];
+  document.getElementById('trophy-emoji').textContent = emojis[s];
+}
+
+function fb(id, correct, msg) {
+  const el = document.getElementById('c'+id+'-fb');
+  el.className = 'feedback show ' + (correct?'correct':msg.startsWith('💡')?'hint':'wrong');
+  el.innerHTML = msg;
+  if(correct && !solved[id]) { solved[id]=true; updateScore(); }
+}
+
+function hint(n) {
+  const hints = {
+    1: '💡 Hint: Which method adds to the END of an array? (Think: stack of plates, add on top)',
+    2: '💡 Hint: To get the last element dynamically, use arr[arr.length - 1]',
+    3: '💡 Hint: Arrays have a .??? property that tells you how many items are in them',
+    4: '💡 Hint: Pass an arrow function: .sort((a, b) => a - b) — this tells JS to compare numbers, not strings',
+    5: '💡 Hint: Use .slice(start, end) — it does NOT modify the original, and end is exclusive',
+    6: '💡 Hint: Use the spread operator: [...a, ...b] — it unpacks both arrays into a new one',
+    7: '💡 Hint: b = a copies the REFERENCE, not the value. So b.push(4) modifies the SAME array that a points to.',
+    8: '💡 Hint: .flat(Infinity) flattens ALL levels, no matter how deeply nested',
+    9: '💡 Hint: const locks the REFERENCE (the pointer), not the contents. You can still push/pop.',
+    10: '💡 Hint: splice(startIndex, deleteCount, item1, item2...). You want to start at index 1, delete 2, insert 2 new items.'
+  };
+  fb(n, false, hints[n]);
+}
+
+const ANSWERS = {
+  1: v => v.toLowerCase().trim() === 'push',
+  2: v => { const c = v.replace(/\s/g,'').toLowerCase(); return c.includes('marks[marks.length-1]') || c.includes('marks[marks.length-1]'); },
+  3: v => v.replace(/\s/g,'').toLowerCase().includes('students.length'),
+  4: v => { const c = v.replace(/\s/g,''); return c.includes('a-b') || c.includes('(a,b)=>a-b') || c.includes('function(a,b){returna-b}'); },
+  5: v => { const c = v.replace(/\s/g,'').toLowerCase(); return c.includes('slice') && !c.includes('splice'); },
+  6: v => { const c = v.replace(/\s/g,''); return c.includes('...a') && c.includes('...b'); },
+  7: v => { const c = v.replace(/\s/g,''); return c === '[1,2,3,4]'; },
+  8: v => { const c = v.replace(/\s/g,'').toLowerCase(); return c.includes('flat(infinity)') || c.includes("flat(infinity)"); },
+  9: v => v.trim().toLowerCase() === 'b',
+  10: v => { const c = v.replace(/\s/g,'').toLowerCase(); return c.includes('splice(1,2') && c.includes('standup') && (c.includes('designreview')||c.includes('"design')); }
+};
+
+const CORRECT_MSG = {
+  1: '✅ Correct! .push("Jeans") adds to the end. Array becomes ["Shoes","Shirt","Jeans"]. O(1) — super fast!',
+  2: '✅ Correct! marks[marks.length - 1] dynamically gets the last element regardless of array size. marks.length = 4, so marks[3] = 95.',
+  3: '✅ Correct! students.length returns 4. The .length property always tells you how many elements are in the array.',
+  4: '✅ Correct! .sort((a, b) => a - b) forces numeric comparison. When a - b is negative, a comes first. Result: [5, 32, 100, 200].',
+  5: '✅ Correct! .slice(1, 4) returns ["banana","cherry","date"]. Remember: end index is EXCLUSIVE. Original array untouched!',
+  6: '✅ Correct! [...a, ...b] spreads both arrays into a new one → [1,2,3,4,5,6]. Modern, clean, and can add extras like [...a, 99, ...b].',
+  7: '✅ Correct! [1,2,3,4]. Since b = a copies the reference, both a and b point to the same array. b.push(4) changes it for BOTH.',
+  8: '✅ Correct! .flat(Infinity) recursively flattens all nesting levels → [1,2,3,4,5,6]. A depth of 1 would only flatten one level.',
+  9: '✅ Correct! Only B causes an error. arr = [...] tries to reassign the const binding, which is illegal. arr.push() is fine — it modifies contents.',
+  10: '✅ Boss Challenge Complete! tasks.splice(1, 2, "Standup", "Design Review") — starts at index 1, removes 2, inserts 2 new items. Result: ["Email","Standup","Design Review","Code Review","Deploy"]'
+};
+
+function checkC(n) {
+  const v = document.getElementById('c'+n+'-input').value;
+  if(ANSWERS[n](v)) fb(n, true, CORRECT_MSG[n]);
+  else fb(n, false, '❌ Not quite. Try again or click Hint!');
+}
+
+// ── INIT ──
+refreshPP();
+refreshSU();
+runCreate();
+</script>
+</body>
+</html>
